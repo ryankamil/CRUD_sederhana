@@ -2,7 +2,7 @@
 
 Simple Web Application CRUD with localStorage HTML5.
 
-This is sample web application CRUD with localStorage HTML5.
+visit to link : https://ryankamil.github.io/crud_sederhana/
 
 ## credit :
 
