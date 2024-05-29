@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Aplikasi Web Sederhana</title>
+    <script src="files/js/jquery.min.js"></script>
+    <script src="files/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="files/bootstrap/css/bootstrap.min.css" />
+  </head>
+  <body onload="muatDaftarData();">
+    <div class="col-md-8 col-md-offset-2" ng-controller="listContactCtrl">
+      <div class="page-header">
+        <h1>CRUD Web Sederhana</h1>
+        <ul class="nav nav-pills">
+          <li><a id="nav-list-data" href="javascript:void(0);" onclick="gantiMenu('list-data');">Daftar Data</a></li>
+          <li><a id="nav-tambah-data" href="javascript:void(0);" onclick="gantiMenu('tambah-data');">Tambah Data</a></li>
+        </ul>
+      </div>
+      <div id="tambah-data" class="well" style="display: none">
+        <form id="form-data">
+          <div id="name-group" class="form-group">
+            <label>Nama Barang:</label>
+            <input type="text" class="form-control" id="nama" name="nama" placeholder="contoh: Nasi Goreng" /><br />
+          </div>
+          <div id="kategori-group" class="form-group">
+            <label>Kategori:</label>
+            <input type="text" class="form-control" id="kategori" name="kategori" placeholder="contoh: Makanan" /><br />
+          </div>
+          <div id="harga-group" class="form-group">
+            <label>Harga:</label>
+            <textarea class="form-control" id="harga" name="harga" placeholder="contoh: 15000"></textarea><br />
+          </div>
+          <input type="button" value="Simpan" onclick="simpanData();" class="btn btn-success btn-small" />
+          <input type="reset" value="Reset" onclick="" class="btn btn-warning btn-small" />
+        </form>
+      </div>
+      <div id="edit-data" class="well" style="display: none">
+        <form id="eform-data">
+          <div id="name-group" class="form-group" style="display: none">
+            <label>id data:</label>
+            <input type="text" class="form-control" id="eid_data" name="nama" placeholder="" /><br />
+          </div>
+
+          <div id="name-group" class="form-group">
+            <label>Nama:</label>
+            <input type="text" class="form-control" id="enama" name="nama" placeholder="contoh: Nasi Goreng" /><br />
+          </div>
+          <div id="kategori-group" class="form-group">
+            <label>kategori:</label>
+            <input type="text" class="form-control" id="ekatagori" name="kategori" placeholder="contoh: Makanan" /><br />
+          </div>
+          <div id="harga-group" class="form-group">
+            <label>hargaerangan:</label>
+            <textarea class="form-control" id="eharga" name="harga" placeholder="contoh: 15000"></textarea><br />
+          </div>
+          <input type="button" value="Simpan" onclick="simpanEditData();" class="btn btn-success btn-small" />
+          <input type="reset" value="Reset" onclick="" class="btn btn-warning btn-small" />
+          <input type="button" value="Cancel" onclick="gantiMenu('list-data');" class="btn btn-warning btn-small" />
+        </form>
+      </div>
+      <div id="list-data" class="well">Tidak ada data...</div>
+    </div>
+  </body>
+  <script type="text/javascript">
+    function muatDaftarData() {
+      if (localStorage.daftar_data && localStorage.id_data) {
+        daftar_data = JSON.parse(localStorage.getItem("daftar_data"));
+
+        var data_app = "";
+
+        if (daftar_data.length > 0) {
+          data_app = '<table class="table">';
+          data_app += "<thead>" + "<th>ID</th>" + "<th>Nama</th>" + "<th>Karegori</th>" + "<th>Harga</th>" + "<th>Tombol Hapus</th>" + "<th>Tombol Edit</th>" + "</thead><tbody>";
+
+          for (i in daftar_data) {
+            data_app += "<tr>";
+            data_app +=
+              "<td>" +
+              daftar_data[i].id_data +
+              " </td>" +
+              "<td>" +
+              daftar_data[i].nama +
+              " </td>" +
+              "<td>" +
+              daftar_data[i].kategori +
+              " </td>" +
+              "<td>" +
+              daftar_data[i].harga +
+              " </td>" +
+              '<td><a class="btn btn-danger btn-small" href="javascript:void(0)" onclick="hapusData(\'' +
+              daftar_data[i].id_data +
+              "')\">Hapus</a></td>" +
+              '<td><a class="btn btn-warning btn-small" href="javascript:void(0)" onclick="editData(\'' +
+              daftar_data[i].id_data +
+              "')\">Edit</a></td>";
+            data_app += "</tr>";
+          }
+          data_app += "</tbody></table>";
+        } else {
+          data_app = "Tidak ada data...";
+        }
+
+        $("#list-data").html(data_app);
+        $("#list-data").hide();
+        $("#list-data").fadeIn(100);
+      }
+    }
+
+    function editData(id) {
+      if (localStorage.daftar_data && localStorage.id_data) {
+        daftar_data = JSON.parse(localStorage.getItem("daftar_data"));
+        idx_data = 0;
+        for (i in daftar_data) {
+          if (daftar_data[i].id_data == id) {
+            $("#eid_data").val(daftar_data[i].id_data);
+            $("#enama").val(daftar_data[i].nama);
+            $("#ekatagori").val(daftar_data[i].kategori);
+            $("#eharga").val(daftar_data[i].harga);
+            daftar_data.splice(idx_data, 1);
+          }
+          idx_data++;
+        }
+        gantiMenu("edit-data");
+      }
+    }
+
+    function simpanData() {
+      nama = $("#nama").val();
+      kategori = $("#kategori").val();
+      harga = $("#harga").val();
+
+      if (localStorage.daftar_data && localStorage.id_data) {
+        daftar_data = JSON.parse(localStorage.getItem("daftar_data"));
+        id_data = parseInt(localStorage.getItem("id_data"));
+      } else {
+        daftar_data = [];
+        id_data = 0;
+      }
+
+      id_data++;
+      daftar_data.push({ id_data: id_data, nama: nama, kategori: kategori, harga: harga });
+      localStorage.setItem("daftar_data", JSON.stringify(daftar_data));
+      localStorage.setItem("id_data", id_data);
+      document.getElementById("form-data").reset();
+      gantiMenu("list-data");
+
+      return false;
+    }
+
+    function simpanEditData() {
+      id_data = $("#eid_data").val();
+      nama = $("#enama").val();
+      kategori = $("#ekatagori").val();
+      harga = $("#eharga").val();
+
+      daftar_data.push({ id_data: id_data, nama: nama, kategori: kategori, harga: harga });
+      localStorage.setItem("daftar_data", JSON.stringify(daftar_data));
+      document.getElementById("eform-data").reset();
+      gantiMenu("list-data");
+
+      return false;
+    }
+
+    function hapusData(id) {
+      if (localStorage.daftar_data && localStorage.id_data) {
+        daftar_data = JSON.parse(localStorage.getItem("daftar_data"));
+
+        idx_data = 0;
+        for (i in daftar_data) {
+          if (daftar_data[i].id_data == id) {
+            daftar_data.splice(idx_data, 1);
+          }
+          idx_data++;
+        }
+
+        localStorage.setItem("daftar_data", JSON.stringify(daftar_data));
+        muatDaftarData();
+      }
+    }
+
+    function gantiMenu(menu) {
+      if (menu == "list-data") {
+        muatDaftarData();
+        $("#tambah-data").hide();
+        $("#list-data").fadeIn();
+        $("#edit-data").hide();
+      } else if (menu == "tambah-data") {
+        $("#tambah-data").fadeIn();
+        $("#list-data").hide();
+        $("#edit-data").hide();
+      } else if (menu == "edit-data") {
+        $("#edit-data").fadeIn();
+        $("#tambah-data").hide();
+        $("#list-data").hide();
+      }
+    }
+  </script>
+</html>
